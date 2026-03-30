@@ -81,14 +81,30 @@
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
-      var dates = params.get('dates') || '';
-      var text = params.get('text') || '';
-      var location = params.get('location') || '';
+      var d = params.get('d') || '';
+      var t = params.get('t') || '';
+      var l = params.get('l') || '';
+
+      // Reconstruct Google Calendar URL: add seconds + 1hr end time
+      var start = d + '00';
+      var end = '';
+      if (d) {
+        var m = d.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})$/);
+        if (m) {
+          var dt = new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]);
+          dt.setHours(dt.getHours() + 1);
+          end = '' + dt.getFullYear() +
+            ('0'+(dt.getMonth()+1)).slice(-2) +
+            ('0'+dt.getDate()).slice(-2) + 'T' +
+            ('0'+dt.getHours()).slice(-2) +
+            ('0'+dt.getMinutes()).slice(-2) + '00';
+        }
+      }
 
       var parts = [];
-      if (dates) parts.push('dates=' + dates);
-      if (text) parts.push('text=' + text);
-      if (location) parts.push('location=' + location);
+      if (d) parts.push('dates=' + start + '/' + end);
+      if (t) parts.push('text=' + t);
+      if (l) parts.push('location=' + l);
 
       var calUrl = 'https://calendar.google.com/calendar/r/eventedit?' + parts.join('&');
 
