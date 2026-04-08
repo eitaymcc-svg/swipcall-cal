@@ -3,78 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendar Link Test v4</title>
+  <title>Calendar Link Test v5</title>
   <style>
     body { background: #1C1C1E; color: #fff; font-family: sans-serif; padding: 20px; }
-    a, button { display: block; width: 100%; background: #FF6B35; color: #fff; padding: 16px;
-        border-radius: 10px; text-decoration: none; text-align: center; margin: 6px 0;
-        font-size: 16px; font-weight: 600; border: none; cursor: pointer; box-sizing: border-box; }
+    button { display: block; width: 100%; background: #FF6B35; color: #fff; padding: 16px;
+        border-radius: 10px; text-align: center; margin: 6px 0;
+        font-size: 16px; font-weight: 600; border: none; cursor: pointer; }
     h3 { color: #8E8E93; margin-top: 18px; font-size: 12px; }
-    .info { color: #D1D1D6; font-size: 13px; text-align: center; margin-bottom: 16px; }
   </style>
 </head>
 <body>
-  <h2>Force Browser Tests</h2>
-  <p class="info">המטרה: לפתוח eventedit בדפדפן, לא באפליקציה.<br>Force close ליומן לפני כל בדיקה.</p>
+  <h2>Hebrew Tests</h2>
 
-  <h3>29. form GET submit</h3>
-  <form action="https://calendar.google.com/calendar/r/eventedit" method="GET">
-    <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
-    <input type="hidden" name="text" value="Test+Event+29">
-    <input type="hidden" name="location" value="Test+Location">
-    <button type="submit">Test 29</button>
-  </form>
-
-  <h3>30. form POST submit</h3>
-  <form action="https://calendar.google.com/calendar/r/eventedit" method="POST">
-    <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
-    <input type="hidden" name="text" value="Test+Event+30">
-    <input type="hidden" name="location" value="Test+Location">
-    <button type="submit">Test 30</button>
-  </form>
-
-  <h3>31. a href + target="_blank"</h3>
-  <a href="https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+31&location=Test+Location" target="_blank">Test 31</a>
-
-  <h3>32. a href + target="_blank" + rel="noreferrer noopener"</h3>
-  <a href="https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+32&location=Test+Location" target="_blank" rel="noreferrer noopener">Test 32</a>
-
-  <h3>33. window.open + noopener</h3>
-  <button onclick="window.open('https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+33&location=Test+Location','_blank','noopener')">Test 33</button>
-
-  <h3>34. form action=TEMPLATE format</h3>
+  <h3>34H. form action=TEMPLATE + Hebrew</h3>
   <form action="https://calendar.google.com/calendar/event" method="GET">
     <input type="hidden" name="action" value="TEMPLATE">
     <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
-    <input type="hidden" name="text" value="Test+Event+34">
-    <input type="hidden" name="location" value="Test+Location">
-    <button type="submit">Test 34</button>
+    <input type="hidden" name="text" value="תיקון מזגן - שם העסק">
+    <input type="hidden" name="location" value="רחוב הרצל 5, תל אביב">
+    <button type="submit">Test 34H</button>
   </form>
 
-  <h3>35. form to www.google.com/calendar</h3>
+  <h3>35H. form www.google.com/calendar + Hebrew</h3>
   <form action="https://www.google.com/calendar/render" method="GET">
     <input type="hidden" name="action" value="TEMPLATE">
     <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
-    <input type="hidden" name="text" value="Test+Event+35">
-    <input type="hidden" name="location" value="Test+Location">
-    <button type="submit">Test 35</button>
+    <input type="hidden" name="text" value="תיקון מזגן - שם העסק">
+    <input type="hidden" name="location" value="רחוב הרצל 5, תל אביב">
+    <button type="submit">Test 35H</button>
   </form>
-
-  <h3>36. meta refresh redirect (click to load)</h3>
-  <button onclick="var w=window.open('','_self');w.document.write('<meta http-equiv=refresh content=0;url=https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+36&location=Test+Location>');">Test 36</button>
-
-  <h3>37. anchor click simulation</h3>
-  <button id="test37">Test 37</button>
-  <script>
-    document.getElementById('test37').addEventListener('click', function() {
-      var a = document.createElement('a');
-      a.href = 'https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+37&location=Test+Location';
-      a.target = '_blank';
-      a.rel = 'noreferrer noopener';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    });
-  </script>
 </body>
 </html>
