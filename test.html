@@ -3,14 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendar Test v6</title>
+  <title>Calendar Test v7</title>
   <style>
     body { background: #1C1C1E; color: #fff; font-family: sans-serif; padding: 20px;
            display: flex; flex-direction: column; align-items: center; justify-content: center;
            min-height: 100vh; }
     button { background: #FF6B35; color: #fff; padding: 18px 40px; border-radius: 12px;
-        font-size: 18px; font-weight: 600; border: none; cursor: pointer; margin-top: 24px; }
+        font-size: 18px; font-weight: 600; border: none; cursor: pointer; margin-top: 24px;
+        width: 100%; }
+    button.retry { background: #2ECC71; margin-top: 16px; animation: pulse 1s infinite; }
     p { color: #D1D1D6; font-size: 14px; text-align: center; margin-top: 12px; }
+    .hidden { display: none; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
   </style>
 </head>
 <body>
@@ -19,28 +26,57 @@
     <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
     <input type="hidden" name="text" value="תיקון מזגן - טסט">
     <input type="hidden" name="location" value="רחוב הרצל 5, תל אביב">
-    <button type="submit">Add to Calendar</button>
+    <button type="submit" id="mainBtn">Add to Calendar</button>
   </form>
+  <button class="retry hidden" id="retryBtn" onclick="document.getElementById('calForm').submit()">Tap again to add event</button>
   <p id="status"></p>
 
   <script>
-    var submitted = false;
+    var hasSubmitted = false;
+    var retryShown = false;
 
+    // Track form submission
     document.getElementById('calForm').addEventListener('submit', function() {
-      submitted = true;
+      hasSubmitted = true;
+      sessionStorage.setItem('calRetry', '1');
     });
 
-    // When user returns to this page (Calendar app opened to home and user pressed back),
-    // auto-submit again - Calendar is now warm so event details will show.
+    function showRetry() {
+      if (hasSubmitted && !retryShown) {
+        retryShown = true;
+        document.getElementById('retryBtn').classList.remove('hidden');
+        document.getElementById('mainBtn').style.display = 'none';
+        document.getElementById('status').textContent = 'The calendar didn\'t open correctly? Tap the green button.';
+      }
+    }
+
+    // Method 1: visibilitychange
     document.addEventListener('visibilitychange', function() {
-      if (!document.hidden && submitted) {
-        submitted = false; // prevent infinite loop
-        document.getElementById('status').textContent = 'Opening again...';
-        setTimeout(function() {
-          document.getElementById('calForm').submit();
-        }, 500);
+      if (!document.hidden && hasSubmitted) showRetry();
+    });
+
+    // Method 2: focus
+    window.addEventListener('focus', function() {
+      if (hasSubmitted) showRetry();
+    });
+
+    // Method 3: pageshow (fires on back-forward cache)
+    window.addEventListener('pageshow', function() {
+      if (hasSubmitted) showRetry();
+      // Also check sessionStorage for page reload case
+      if (sessionStorage.getItem('calRetry')) {
+        sessionStorage.removeItem('calRetry');
+        hasSubmitted = true;
+        showRetry();
       }
     });
+
+    // Check on load too (in case page was reloaded)
+    if (sessionStorage.getItem('calRetry')) {
+      sessionStorage.removeItem('calRetry');
+      hasSubmitted = true;
+      showRetry();
+    }
   </script>
 </body>
 </html>
