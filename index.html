@@ -61,7 +61,10 @@
     }
 
     .cal-btn {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       width: 100%;
       background: #FF6B35;
       color: #FFFFFF;
@@ -77,6 +80,8 @@
 
     .cal-btn:active { background: #E55A2B; }
 
+    .cal-btn svg { flex-shrink: 0; }
+
     .other-link {
       display: block;
       color: #8E8E93;
@@ -90,7 +95,10 @@
     }
 
     .retry-btn {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       width: 85%;
       max-width: 320px;
       background: #2ECC71;
@@ -127,7 +135,7 @@
 <body>
   <img class="logo" src="logo.png" alt="Swipcall">
   <div class="brand">Powered by Swipcall</div>
-  <div class="tagline" id="tagline">Add this appointment to your calendar</div>
+  <div class="tagline" id="tagline"></div>
 
   <div class="buttons" id="btnGroup">
     <form action="https://calendar.google.com/calendar/event" method="GET" id="calForm">
@@ -135,14 +143,59 @@
       <input type="hidden" name="dates" id="fDates">
       <input type="hidden" name="text" id="fText">
       <input type="hidden" name="location" id="fLocation">
-      <button type="submit" class="cal-btn" id="mainBtn">Add to Calendar</button>
+      <button type="submit" class="cal-btn" id="mainBtn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="#fff" stroke-width="2"/><path d="M3 9h18" stroke="#fff" stroke-width="2"/><path d="M8 2v4M16 2v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="7" y="12" width="3" height="3" rx="0.5" fill="#fff"/><rect x="7" y="16.5" width="3" height="3" rx="0.5" fill="#fff"/><rect x="14" y="12" width="3" height="3" rx="0.5" fill="#fff"/></svg>
+        <span id="mainBtnText"></span>
+      </button>
     </form>
-    <button class="other-link" id="otherBtn">Not using Google Calendar?</button>
+    <button class="other-link" id="otherBtn"></button>
   </div>
-  <button class="retry-btn hidden" id="retryBtn">Tap here to add</button>
+  <button class="retry-btn hidden" id="retryBtn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="#fff" stroke-width="2"/><path d="M3 9h18" stroke="#fff" stroke-width="2"/><path d="M8 2v4M16 2v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="7" y="12" width="3" height="3" rx="0.5" fill="#fff"/><rect x="7" y="16.5" width="3" height="3" rx="0.5" fill="#fff"/><rect x="14" y="12" width="3" height="3" rx="0.5" fill="#fff"/></svg>
+    <span id="retryBtnText"></span>
+  </button>
 
   <script>
     (function () {
+      // --- i18n ---
+      var strings = {
+        en: { tagline: 'Add this appointment to your calendar', btn: 'Google Calendar', retry: 'Tap here to add', retryTagline: 'Tap the button to add', other: 'Not using Google Calendar?' },
+        he: { tagline: '\u05D4\u05D5\u05E1\u05E3 \u05EA\u05D5\u05E8 \u05DC\u05D9\u05D5\u05DE\u05DF \u05E9\u05DC\u05DA', btn: 'Google Calendar', retry: '\u05DC\u05D7\u05E5 \u05DB\u05D0\u05DF \u05DC\u05D4\u05D5\u05E1\u05E4\u05D4', retryTagline: '\u05DC\u05D7\u05E5 \u05E2\u05DC \u05D4\u05DB\u05E4\u05EA\u05D5\u05E8 \u05DC\u05D4\u05D5\u05E1\u05E4\u05D4', other: '\u05DC\u05D0 \u05DE\u05E9\u05EA\u05DE\u05E9 \u05D1-Google Calendar?' },
+        ar: { tagline: '\u0623\u0636\u0641 \u0647\u0630\u0627 \u0627\u0644\u0645\u0648\u0639\u062F \u0625\u0644\u0649 \u062A\u0642\u0648\u064A\u0645\u0643', btn: 'Google Calendar', retry: '\u0627\u0636\u063A\u0637 \u0647\u0646\u0627 \u0644\u0644\u0625\u0636\u0627\u0641\u0629', retryTagline: '\u0627\u0636\u063A\u0637 \u0627\u0644\u0632\u0631 \u0644\u0644\u0625\u0636\u0627\u0641\u0629', other: '\u0644\u0627 \u062A\u0633\u062A\u062E\u062F\u0645 Google Calendar\u061F' },
+        es: { tagline: 'Agrega esta cita a tu calendario', btn: 'Google Calendar', retry: 'Toca para agregar', retryTagline: 'Toca el boton para agregar', other: 'No usas Google Calendar?' },
+        fr: { tagline: 'Ajoutez ce rendez-vous a votre calendrier', btn: 'Google Calendar', retry: 'Appuyez pour ajouter', retryTagline: 'Appuyez sur le bouton', other: 'Pas Google Calendar ?' },
+        de: { tagline: 'Termin zum Kalender hinzufugen', btn: 'Google Calendar', retry: 'Tippen zum Hinzufugen', retryTagline: 'Auf den Button tippen', other: 'Kein Google Calendar?' },
+        ru: { tagline: '\u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u0432\u0441\u0442\u0440\u0435\u0447\u0443 \u0432 \u043A\u0430\u043B\u0435\u043D\u0434\u0430\u0440\u044C', btn: 'Google Calendar', retry: '\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u0434\u043B\u044F \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u044F', retryTagline: '\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043A\u043D\u043E\u043F\u043A\u0443', other: '\u041D\u0435 Google Calendar?' },
+        pt: { tagline: 'Adicione este compromisso ao seu calendario', btn: 'Google Calendar', retry: 'Toque para adicionar', retryTagline: 'Toque no botao para adicionar', other: 'Nao usa Google Calendar?' },
+        tr: { tagline: 'Bu randevuyu takvimine ekle', btn: 'Google Calendar', retry: 'Eklemek icin dokun', retryTagline: 'Eklemek icin butona dokun', other: 'Google Calendar kullanmiyor musun?' },
+        it: { tagline: 'Aggiungi questo appuntamento al calendario', btn: 'Google Calendar', retry: 'Tocca per aggiungere', retryTagline: 'Tocca il pulsante', other: 'Non usi Google Calendar?' },
+        zh: { tagline: '\u5C06\u6B64\u9884\u7EA6\u6DFB\u52A0\u5230\u65E5\u5386', btn: 'Google Calendar', retry: '\u70B9\u51FB\u6DFB\u52A0', retryTagline: '\u70B9\u51FB\u6309\u94AE\u6DFB\u52A0', other: '\u4E0D\u4F7F\u7528 Google Calendar\uFF1F' },
+        hi: { tagline: '\u0907\u0938 \u0905\u092A\u0949\u0907\u0902\u091F\u092E\u0947\u0902\u091F \u0915\u094B \u0905\u092A\u0928\u0947 \u0915\u0948\u0932\u0947\u0902\u0921\u0930 \u092E\u0947\u0902 \u091C\u094B\u0921\u093C\u0947\u0902', btn: 'Google Calendar', retry: '\u091C\u094B\u0921\u093C\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F \u091F\u0948\u092A \u0915\u0930\u0947\u0902', retryTagline: '\u092C\u091F\u0928 \u091F\u0948\u092A \u0915\u0930\u0947\u0902', other: 'Google Calendar \u0928\u0939\u0940\u0902 \u0939\u0948?' },
+        ja: { tagline: '\u3053\u306E\u4E88\u7D04\u3092\u30AB\u30EC\u30F3\u30C0\u30FC\u306B\u8FFD\u52A0', btn: 'Google Calendar', retry: '\u30BF\u30C3\u30D7\u3057\u3066\u8FFD\u52A0', retryTagline: '\u30DC\u30BF\u30F3\u3092\u30BF\u30C3\u30D7', other: 'Google Calendar\u4EE5\u5916\uFF1F' },
+        ko: { tagline: '\uC774 \uC608\uC57D\uC744 \uCE98\uB9B0\uB354\uC5D0 \uCD94\uAC00', btn: 'Google Calendar', retry: '\uD0ED\uD558\uC5EC \uCD94\uAC00', retryTagline: '\uBC84\uD2BC\uC744 \uD0ED\uD558\uC138\uC694', other: 'Google Calendar\uC774 \uC544\uB2CC\uAC00\uC694?' },
+        uk: { tagline: '\u0414\u043E\u0434\u0430\u0439\u0442\u0435 \u0437\u0443\u0441\u0442\u0440\u0456\u0447 \u0434\u043E \u043A\u0430\u043B\u0435\u043D\u0434\u0430\u0440\u044F', btn: 'Google Calendar', retry: '\u041D\u0430\u0442\u0438\u0441\u043D\u0456\u0442\u044C \u0434\u043B\u044F \u0434\u043E\u0434\u0430\u0432\u0430\u043D\u043D\u044F', retryTagline: '\u041D\u0430\u0442\u0438\u0441\u043D\u0456\u0442\u044C \u043A\u043D\u043E\u043F\u043A\u0443', other: '\u041D\u0435 Google Calendar?' },
+        pl: { tagline: 'Dodaj to spotkanie do kalendarza', btn: 'Google Calendar', retry: 'Dotknij, aby dodac', retryTagline: 'Dotknij przycisku', other: 'Nie uzywasz Google Calendar?' },
+        nl: { tagline: 'Voeg deze afspraak toe aan je agenda', btn: 'Google Calendar', retry: 'Tik om toe te voegen', retryTagline: 'Tik op de knop', other: 'Geen Google Calendar?' },
+        sv: { tagline: 'Lagg till detta mote i din kalender', btn: 'Google Calendar', retry: 'Tryck for att lagga till', retryTagline: 'Tryck pa knappen', other: 'Inte Google Calendar?' },
+        th: { tagline: '\u0E40\u0E1E\u0E34\u0E48\u0E21\u0E19\u0E31\u0E14\u0E19\u0E35\u0E49\u0E25\u0E07\u0E1B\u0E0F\u0E34\u0E17\u0E34\u0E19', btn: 'Google Calendar', retry: '\u0E41\u0E15\u0E30\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E40\u0E1E\u0E34\u0E48\u0E21', retryTagline: '\u0E41\u0E15\u0E30\u0E1B\u0E38\u0E48\u0E21', other: '\u0E44\u0E21\u0E48\u0E43\u0E0A\u0E49 Google Calendar?' },
+        fa: { tagline: '\u0627\u06CC\u0646 \u0642\u0631\u0627\u0631 \u0645\u0644\u0627\u0642\u0627\u062A \u0631\u0627 \u0628\u0647 \u062A\u0642\u0648\u06CC\u0645 \u0627\u0636\u0627\u0641\u0647 \u06A9\u0646\u06CC\u062F', btn: 'Google Calendar', retry: '\u0628\u0631\u0627\u06CC \u0627\u0636\u0627\u0641\u0647 \u06A9\u0631\u062F\u0646 \u0628\u0632\u0646\u06CC\u062F', retryTagline: '\u062F\u06A9\u0645\u0647 \u0631\u0627 \u0628\u0632\u0646\u06CC\u062F', other: '\u0627\u0632 Google Calendar \u0627\u0633\u062A\u0641\u0627\u062F\u0647 \u0646\u0645\u06CC\u200C\u06A9\u0646\u06CC\u062F\u061F' },
+      };
+
+      var rtlLangs = { he: 1, ar: 1, fa: 1, ur: 1 };
+      var browserLang = (navigator.language || 'en').split('-')[0].toLowerCase();
+      var i18n = strings[browserLang] || strings.en;
+
+      if (rtlLangs[browserLang]) {
+        document.documentElement.dir = 'rtl';
+        document.documentElement.lang = browserLang;
+      }
+
+      document.getElementById('tagline').textContent = i18n.tagline;
+      document.getElementById('mainBtnText').textContent = i18n.btn;
+      document.getElementById('retryBtnText').textContent = i18n.retry;
+      document.getElementById('otherBtn').textContent = i18n.other;
+
+      // --- URL params ---
       var params = new URLSearchParams(window.location.search);
       var d = params.get('d') || '';
       var t = params.get('t') || '';
@@ -169,9 +222,7 @@
       document.getElementById('fText').value = t;
       document.getElementById('fLocation').value = l;
 
-      // Retry logic for Android cold start bug:
-      // Some devices open Google Calendar to home screen on first try.
-      // When the user returns, show a retry button (Calendar is now warm).
+      // --- Retry logic for Android cold start bug ---
       var hasSubmitted = false;
       var retryShown = false;
 
@@ -189,7 +240,7 @@
           retryShown = true;
           document.getElementById('retryBtn').classList.remove('hidden');
           document.getElementById('btnGroup').classList.add('hidden');
-          document.getElementById('tagline').textContent = 'Tap the button to add';
+          document.getElementById('tagline').textContent = i18n.retryTagline;
         }
       }
 
@@ -216,7 +267,7 @@
         showRetry();
       }
 
-      // "Not using Google Calendar?" link: download .ics file
+      // --- .ics fallback for non-Google Calendar ---
       document.getElementById('otherBtn').addEventListener('click', function () {
         var em = d.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})$/);
         if (!em) return;
