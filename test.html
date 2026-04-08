@@ -3,34 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendar Link Test v5</title>
+  <title>Calendar Test v6</title>
   <style>
-    body { background: #1C1C1E; color: #fff; font-family: sans-serif; padding: 20px; }
-    button { display: block; width: 100%; background: #FF6B35; color: #fff; padding: 16px;
-        border-radius: 10px; text-align: center; margin: 6px 0;
-        font-size: 16px; font-weight: 600; border: none; cursor: pointer; }
-    h3 { color: #8E8E93; margin-top: 18px; font-size: 12px; }
+    body { background: #1C1C1E; color: #fff; font-family: sans-serif; padding: 20px;
+           display: flex; flex-direction: column; align-items: center; justify-content: center;
+           min-height: 100vh; }
+    button { background: #FF6B35; color: #fff; padding: 18px 40px; border-radius: 12px;
+        font-size: 18px; font-weight: 600; border: none; cursor: pointer; margin-top: 24px; }
+    p { color: #D1D1D6; font-size: 14px; text-align: center; margin-top: 12px; }
   </style>
 </head>
 <body>
-  <h2>Hebrew Tests</h2>
-
-  <h3>34H. form action=TEMPLATE + Hebrew</h3>
-  <form action="https://calendar.google.com/calendar/event" method="GET">
+  <form action="https://calendar.google.com/calendar/event" method="GET" id="calForm">
     <input type="hidden" name="action" value="TEMPLATE">
     <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
-    <input type="hidden" name="text" value="תיקון מזגן - שם העסק">
+    <input type="hidden" name="text" value="תיקון מזגן - טסט">
     <input type="hidden" name="location" value="רחוב הרצל 5, תל אביב">
-    <button type="submit">Test 34H</button>
+    <button type="submit">Add to Calendar</button>
   </form>
+  <p id="status"></p>
 
-  <h3>35H. form www.google.com/calendar + Hebrew</h3>
-  <form action="https://www.google.com/calendar/render" method="GET">
-    <input type="hidden" name="action" value="TEMPLATE">
-    <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
-    <input type="hidden" name="text" value="תיקון מזגן - שם העסק">
-    <input type="hidden" name="location" value="רחוב הרצל 5, תל אביב">
-    <button type="submit">Test 35H</button>
-  </form>
+  <script>
+    var submitted = false;
+
+    document.getElementById('calForm').addEventListener('submit', function() {
+      submitted = true;
+    });
+
+    // When user returns to this page (Calendar app opened to home and user pressed back),
+    // auto-submit again - Calendar is now warm so event details will show.
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden && submitted) {
+        submitted = false; // prevent infinite loop
+        document.getElementById('status').textContent = 'Opening again...';
+        setTimeout(function() {
+          document.getElementById('calForm').submit();
+        }, 500);
+      }
+    });
+  </script>
 </body>
 </html>
