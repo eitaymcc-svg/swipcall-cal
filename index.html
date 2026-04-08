@@ -77,6 +77,18 @@
 
     .cal-btn:active { background: #E55A2B; }
 
+    .other-link {
+      display: block;
+      color: #8E8E93;
+      font-size: 13px;
+      margin-top: 4px;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      width: 100%;
+    }
+
     .retry-btn {
       display: block;
       width: 85%;
@@ -125,6 +137,7 @@
       <input type="hidden" name="location" id="fLocation">
       <button type="submit" class="cal-btn" id="mainBtn">Add to Calendar</button>
     </form>
+    <button class="other-link" id="otherBtn">Not using Google Calendar?</button>
   </div>
   <button class="retry-btn hidden" id="retryBtn">Tap here to add</button>
 
@@ -203,6 +216,47 @@
         showRetry();
       }
 
+      // "Not using Google Calendar?" link: download .ics file
+      document.getElementById('otherBtn').addEventListener('click', function () {
+        var em = d.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})$/);
+        if (!em) return;
+        var localStart = new Date(+em[1], +em[2] - 1, +em[3], +em[4], +em[5]);
+        var localEnd = new Date(localStart.getTime() + 60 * 60 * 1000);
+
+        var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+        var toUTC = function (date) {
+          return date.getUTCFullYear() +
+            pad(date.getUTCMonth() + 1) +
+            pad(date.getUTCDate()) + 'T' +
+            pad(date.getUTCHours()) +
+            pad(date.getUTCMinutes()) +
+            pad(date.getUTCSeconds()) + 'Z';
+        };
+
+        var ics = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'PRODID:-//Swipcall//EN',
+          'METHOD:PUBLISH',
+          'BEGIN:VEVENT',
+          'UID:swipcall-' + Date.now() + '@swipcall.com',
+          'DTSTART:' + toUTC(localStart),
+          'DTEND:' + toUTC(localEnd),
+          'SUMMARY:' + (t || ''),
+          'LOCATION:' + (l || ''),
+          'STATUS:CONFIRMED',
+          'END:VEVENT',
+          'END:VCALENDAR'
+        ].join('\r\n');
+
+        var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'event.ics';
+        a.click();
+        URL.revokeObjectURL(url);
+      });
     })();
   </script>
 </body>
