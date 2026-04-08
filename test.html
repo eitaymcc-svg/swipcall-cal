@@ -5,98 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calendar Link Test</title>
   <style>
-    body { background: #1C1C1E; color: #fff; font-family: sans-serif; padding: 20px; }
-    a, button { display: block; width: 100%; background: #FF6B35; color: #fff; padding: 16px;
-        border-radius: 10px; text-decoration: none; text-align: center; margin: 8px 0;
-        font-size: 16px; border: none; cursor: pointer; }
-    button.secondary { background: #3A3A3C; }
-    h3 { color: #8E8E93; margin-top: 20px; font-size: 13px; }
-    .warn { color: #E74C3C; font-size: 13px; text-align: center; }
-    .step { background: #2C2C2E; padding: 12px; border-radius: 10px; margin: 8px 0; }
-    .step p { margin: 4px 0; font-size: 14px; color: #D1D1D6; }
+    body { background: #1C1C1E; color: #fff; font-family: sans-serif; padding: 20px;
+           display: flex; flex-direction: column; align-items: center; justify-content: center;
+           min-height: 100vh; }
+    button { display: block; width: 100%; background: #FF6B35; color: #fff; padding: 18px;
+        border-radius: 12px; text-decoration: none; text-align: center; margin: 10px 0;
+        font-size: 18px; font-weight: 600; border: none; cursor: pointer; }
+    h3 { color: #8E8E93; margin-top: 24px; font-size: 13px; width: 100%; }
+    p { color: #D1D1D6; font-size: 14px; text-align: center; }
   </style>
 </head>
 <body>
-  <h2>Calendar Link Test v2</h2>
-  <p class="warn">לפני כל בדיקה: force close לאפליקציית היומן</p>
+  <h3>26. One-click: warm up + redirect (2s delay)</h3>
+  <button id="test26">Add to Calendar</button>
+  <p id="status26"></p>
 
-  <h3>19. Two-step: warm up calendar, then add event</h3>
-  <div class="step">
-    <p>שלב 1: לחץ לפתוח את היומן, חזור לדף הזה</p>
-    <a href="https://calendar.google.com/calendar">Step 1: Open Calendar</a>
-    <p>שלב 2: לחץ להוסיף אירוע (היומן כבר חם)</p>
-    <a href="https://calendar.google.com/calendar/event?action=TEMPLATE&dates=20260410T140000/20260410T150000&text=Test+Event+19&location=Test+Location">Step 2: Add Event</a>
-  </div>
+  <h3>27. One-click: warm up + redirect (3s delay)</h3>
+  <button id="test27">Add to Calendar</button>
+  <p id="status27"></p>
 
-  <h3>20. .ics - open blob (not download)</h3>
-  <button id="test20">Test 20</button>
-
-  <h3>21. .ics - share via Web Share API</h3>
-  <button id="test21">Test 21</button>
-
-  <h3>22. .ics - open with window.location</h3>
-  <button id="test22">Test 22</button>
-
-  <h3>23. .ics - open with data URI in new window</h3>
-  <button id="test23">Test 23</button>
-
-  <h3>24. Google Calendar URL - direct (no redirect)</h3>
-  <a href="https://calendar.google.com/calendar/event?action=TEMPLATE&dates=20260410T140000/20260410T150000&text=Test+Event+24&location=Test+Location">Test 24 (same as format 3)</a>
-
-  <h3>25. Google Calendar - render with crm param</h3>
-  <a href="https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+25&location=Test+Location&crm=AVAILABLE&sf=true">Test 25</a>
+  <h3>28. One-click: warm up + redirect (4s delay)</h3>
+  <button id="test28">Add to Calendar</button>
+  <p id="status28"></p>
 
   <script>
-    var icsContent = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Swipcall//EN',
-      'METHOD:PUBLISH',
-      'BEGIN:VEVENT',
-      'UID:test-' + Date.now() + '@swipcall.com',
-      'DTSTART:20260410T110000Z',
-      'DTEND:20260410T120000Z',
-      'SUMMARY:Test Event',
-      'LOCATION:Test Location',
-      'DESCRIPTION:Test Description',
-      'STATUS:CONFIRMED',
-      'END:VEVENT',
-      'END:VCALENDAR'
-    ].join('\r\n');
+    var eventUrl = 'https://calendar.google.com/calendar/event?action=TEMPLATE&dates=20260410T140000/20260410T150000&text=Test+Event&location=Test+Location';
+    var warmUrl = 'https://calendar.google.com/calendar';
 
-    // Test 20: open blob in new window
-    document.getElementById('test20').addEventListener('click', function() {
-      var blob = new Blob([icsContent], { type: 'text/calendar' });
-      var url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-    });
+    function testWarmRedirect(btnId, statusId, delay) {
+      document.getElementById(btnId).addEventListener('click', function() {
+        // Step 1: open calendar app (warms it up)
+        window.open(warmUrl);
+        document.getElementById(statusId).textContent = 'Calendar opened, waiting ' + (delay/1000) + 's...';
 
-    // Test 21: Web Share API with .ics file
-    document.getElementById('test21').addEventListener('click', function() {
-      var file = new File([icsContent], 'event.ics', { type: 'text/calendar' });
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({
-          files: [file],
-          title: 'Add to Calendar'
-        }).catch(function(e) { alert('Share error: ' + e.message); });
-      } else {
-        alert('Web Share API not supported on this device');
-      }
-    });
+        // Step 2: after delay, navigate to eventedit (app is warm now)
+        setTimeout(function() {
+          document.getElementById(statusId).textContent = 'Redirecting to event...';
+          window.location.href = eventUrl;
+        }, delay);
+      });
+    }
 
-    // Test 22: navigate to blob URL
-    document.getElementById('test22').addEventListener('click', function() {
-      var blob = new Blob([icsContent], { type: 'text/calendar' });
-      var url = URL.createObjectURL(blob);
-      window.location.href = url;
-    });
-
-    // Test 23: data URI in new window
-    document.getElementById('test23').addEventListener('click', function() {
-      var b64 = btoa(unescape(encodeURIComponent(icsContent)));
-      var dataUri = 'data:text/calendar;base64,' + b64;
-      window.open(dataUri, '_blank');
-    });
+    testWarmRedirect('test26', 'status26', 2000);
+    testWarmRedirect('test27', 'status27', 3000);
+    testWarmRedirect('test28', 'status28', 4000);
   </script>
 </body>
 </html>
