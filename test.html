@@ -3,52 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendar Link Test</title>
+  <title>Calendar Link Test v4</title>
   <style>
-    body { background: #1C1C1E; color: #fff; font-family: sans-serif; padding: 20px;
-           display: flex; flex-direction: column; align-items: center; justify-content: center;
-           min-height: 100vh; }
-    button { display: block; width: 100%; background: #FF6B35; color: #fff; padding: 18px;
-        border-radius: 12px; text-decoration: none; text-align: center; margin: 10px 0;
-        font-size: 18px; font-weight: 600; border: none; cursor: pointer; }
-    h3 { color: #8E8E93; margin-top: 24px; font-size: 13px; width: 100%; }
-    p { color: #D1D1D6; font-size: 14px; text-align: center; }
+    body { background: #1C1C1E; color: #fff; font-family: sans-serif; padding: 20px; }
+    a, button { display: block; width: 100%; background: #FF6B35; color: #fff; padding: 16px;
+        border-radius: 10px; text-decoration: none; text-align: center; margin: 6px 0;
+        font-size: 16px; font-weight: 600; border: none; cursor: pointer; box-sizing: border-box; }
+    h3 { color: #8E8E93; margin-top: 18px; font-size: 12px; }
+    .info { color: #D1D1D6; font-size: 13px; text-align: center; margin-bottom: 16px; }
   </style>
 </head>
 <body>
-  <h3>26. One-click: warm up + redirect (2s delay)</h3>
-  <button id="test26">Add to Calendar</button>
-  <p id="status26"></p>
+  <h2>Force Browser Tests</h2>
+  <p class="info">המטרה: לפתוח eventedit בדפדפן, לא באפליקציה.<br>Force close ליומן לפני כל בדיקה.</p>
 
-  <h3>27. One-click: warm up + redirect (3s delay)</h3>
-  <button id="test27">Add to Calendar</button>
-  <p id="status27"></p>
+  <h3>29. form GET submit</h3>
+  <form action="https://calendar.google.com/calendar/r/eventedit" method="GET">
+    <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
+    <input type="hidden" name="text" value="Test+Event+29">
+    <input type="hidden" name="location" value="Test+Location">
+    <button type="submit">Test 29</button>
+  </form>
 
-  <h3>28. One-click: warm up + redirect (4s delay)</h3>
-  <button id="test28">Add to Calendar</button>
-  <p id="status28"></p>
+  <h3>30. form POST submit</h3>
+  <form action="https://calendar.google.com/calendar/r/eventedit" method="POST">
+    <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
+    <input type="hidden" name="text" value="Test+Event+30">
+    <input type="hidden" name="location" value="Test+Location">
+    <button type="submit">Test 30</button>
+  </form>
 
+  <h3>31. a href + target="_blank"</h3>
+  <a href="https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+31&location=Test+Location" target="_blank">Test 31</a>
+
+  <h3>32. a href + target="_blank" + rel="noreferrer noopener"</h3>
+  <a href="https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+32&location=Test+Location" target="_blank" rel="noreferrer noopener">Test 32</a>
+
+  <h3>33. window.open + noopener</h3>
+  <button onclick="window.open('https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+33&location=Test+Location','_blank','noopener')">Test 33</button>
+
+  <h3>34. form action=TEMPLATE format</h3>
+  <form action="https://calendar.google.com/calendar/event" method="GET">
+    <input type="hidden" name="action" value="TEMPLATE">
+    <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
+    <input type="hidden" name="text" value="Test+Event+34">
+    <input type="hidden" name="location" value="Test+Location">
+    <button type="submit">Test 34</button>
+  </form>
+
+  <h3>35. form to www.google.com/calendar</h3>
+  <form action="https://www.google.com/calendar/render" method="GET">
+    <input type="hidden" name="action" value="TEMPLATE">
+    <input type="hidden" name="dates" value="20260410T140000/20260410T150000">
+    <input type="hidden" name="text" value="Test+Event+35">
+    <input type="hidden" name="location" value="Test+Location">
+    <button type="submit">Test 35</button>
+  </form>
+
+  <h3>36. meta refresh redirect (click to load)</h3>
+  <button onclick="var w=window.open('','_self');w.document.write('<meta http-equiv=refresh content=0;url=https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+36&location=Test+Location>');">Test 36</button>
+
+  <h3>37. anchor click simulation</h3>
+  <button id="test37">Test 37</button>
   <script>
-    var eventUrl = 'https://calendar.google.com/calendar/event?action=TEMPLATE&dates=20260410T140000/20260410T150000&text=Test+Event&location=Test+Location';
-    var warmUrl = 'https://calendar.google.com/calendar';
-
-    function testWarmRedirect(btnId, statusId, delay) {
-      document.getElementById(btnId).addEventListener('click', function() {
-        // Step 1: open calendar app (warms it up)
-        window.open(warmUrl);
-        document.getElementById(statusId).textContent = 'Calendar opened, waiting ' + (delay/1000) + 's...';
-
-        // Step 2: after delay, navigate to eventedit (app is warm now)
-        setTimeout(function() {
-          document.getElementById(statusId).textContent = 'Redirecting to event...';
-          window.location.href = eventUrl;
-        }, delay);
-      });
-    }
-
-    testWarmRedirect('test26', 'status26', 2000);
-    testWarmRedirect('test27', 'status27', 3000);
-    testWarmRedirect('test28', 'status28', 4000);
+    document.getElementById('test37').addEventListener('click', function() {
+      var a = document.createElement('a');
+      a.href = 'https://calendar.google.com/calendar/r/eventedit?dates=20260410T140000/20260410T150000&text=Test+Event+37&location=Test+Location';
+      a.target = '_blank';
+      a.rel = 'noreferrer noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
   </script>
 </body>
 </html>
