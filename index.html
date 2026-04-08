@@ -31,8 +31,8 @@
     }
 
     .logo {
-      width: 80px;
-      height: 80px;
+      width: 64px;
+      height: 64px;
       border-radius: 22%;
       margin-bottom: 20px;
       animation: logoEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
@@ -125,6 +125,24 @@
 
     .hidden { display: none; }
 
+    .footer {
+      position: fixed;
+      bottom: 16px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in 1s both;
+    }
+
+    .footer a {
+      color: #8E8E93;
+      font-size: 12px;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+    }
+
+    .footer a:active { color: #FF6B35; }
+
     @keyframes logoEntry {
       from { opacity: 0; transform: scale(0.5) rotate(-10deg); }
       to { opacity: 1; transform: scale(1) rotate(0deg); }
@@ -142,8 +160,8 @@
   </style>
 </head>
 <body>
-  <img class="logo" src="logo.png" alt="Swipcall">
-  <div class="brand">Powered by Swipcall</div>
+  <a href="https://swipcall.com" target="_blank" rel="noopener"><img class="logo" src="logo.png" alt="Swipcall"></a>
+  <a href="https://swipcall.com" target="_blank" rel="noopener" style="text-decoration:none"><div class="brand">Powered by Swipcall</div></a>
   <div class="tagline" id="tagline"></div>
 
   <div class="buttons" id="btnGroup">
@@ -167,30 +185,34 @@
     <span id="retryBtnText"></span>
   </button>
 
+  <div class="footer">
+    <a href="https://swipcall.com" target="_blank" rel="noopener" id="footerLink"></a>
+  </div>
+
   <script>
     (function () {
       // --- i18n ---
       var strings = {
-        en: { tagline: 'Add this appointment to your calendar', btn: 'Google Calendar', retry: 'Tap here to add', retryTagline: 'Tap the button to add', other: 'Not using Google Calendar?' },
-        he: { tagline: '\u05D4\u05D5\u05E1\u05E3 \u05EA\u05D5\u05E8 \u05DC\u05D9\u05D5\u05DE\u05DF \u05E9\u05DC\u05DA', btn: 'Google Calendar', retry: '\u05DC\u05D7\u05E5 \u05DB\u05D0\u05DF \u05DC\u05D4\u05D5\u05E1\u05E4\u05D4', retryTagline: '\u05DC\u05D7\u05E5 \u05E2\u05DC \u05D4\u05DB\u05E4\u05EA\u05D5\u05E8 \u05DC\u05D4\u05D5\u05E1\u05E4\u05D4', other: '\u05DC\u05D0 \u05DE\u05E9\u05EA\u05DE\u05E9 \u05D1-Google Calendar?' },
-        ar: { tagline: '\u0623\u0636\u0641 \u0647\u0630\u0627 \u0627\u0644\u0645\u0648\u0639\u062F \u0625\u0644\u0649 \u062A\u0642\u0648\u064A\u0645\u0643', btn: 'Google Calendar', retry: '\u0627\u0636\u063A\u0637 \u0647\u0646\u0627 \u0644\u0644\u0625\u0636\u0627\u0641\u0629', retryTagline: '\u0627\u0636\u063A\u0637 \u0627\u0644\u0632\u0631 \u0644\u0644\u0625\u0636\u0627\u0641\u0629', other: '\u0644\u0627 \u062A\u0633\u062A\u062E\u062F\u0645 Google Calendar\u061F' },
-        es: { tagline: 'Agrega esta cita a tu calendario', btn: 'Google Calendar', retry: 'Toca para agregar', retryTagline: 'Toca el boton para agregar', other: 'No usas Google Calendar?' },
-        fr: { tagline: 'Ajoutez ce rendez-vous a votre calendrier', btn: 'Google Calendar', retry: 'Appuyez pour ajouter', retryTagline: 'Appuyez sur le bouton', other: 'Pas Google Calendar ?' },
-        de: { tagline: 'Termin zum Kalender hinzufugen', btn: 'Google Calendar', retry: 'Tippen zum Hinzufugen', retryTagline: 'Auf den Button tippen', other: 'Kein Google Calendar?' },
-        ru: { tagline: '\u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u0432\u0441\u0442\u0440\u0435\u0447\u0443 \u0432 \u043A\u0430\u043B\u0435\u043D\u0434\u0430\u0440\u044C', btn: 'Google Calendar', retry: '\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u0434\u043B\u044F \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u044F', retryTagline: '\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043A\u043D\u043E\u043F\u043A\u0443', other: '\u041D\u0435 Google Calendar?' },
-        pt: { tagline: 'Adicione este compromisso ao seu calendario', btn: 'Google Calendar', retry: 'Toque para adicionar', retryTagline: 'Toque no botao para adicionar', other: 'Nao usa Google Calendar?' },
-        tr: { tagline: 'Bu randevuyu takvimine ekle', btn: 'Google Calendar', retry: 'Eklemek icin dokun', retryTagline: 'Eklemek icin butona dokun', other: 'Google Calendar kullanmiyor musun?' },
-        it: { tagline: 'Aggiungi questo appuntamento al calendario', btn: 'Google Calendar', retry: 'Tocca per aggiungere', retryTagline: 'Tocca il pulsante', other: 'Non usi Google Calendar?' },
-        zh: { tagline: '\u5C06\u6B64\u9884\u7EA6\u6DFB\u52A0\u5230\u65E5\u5386', btn: 'Google Calendar', retry: '\u70B9\u51FB\u6DFB\u52A0', retryTagline: '\u70B9\u51FB\u6309\u94AE\u6DFB\u52A0', other: '\u4E0D\u4F7F\u7528 Google Calendar\uFF1F' },
-        hi: { tagline: '\u0907\u0938 \u0905\u092A\u0949\u0907\u0902\u091F\u092E\u0947\u0902\u091F \u0915\u094B \u0905\u092A\u0928\u0947 \u0915\u0948\u0932\u0947\u0902\u0921\u0930 \u092E\u0947\u0902 \u091C\u094B\u0921\u093C\u0947\u0902', btn: 'Google Calendar', retry: '\u091C\u094B\u0921\u093C\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F \u091F\u0948\u092A \u0915\u0930\u0947\u0902', retryTagline: '\u092C\u091F\u0928 \u091F\u0948\u092A \u0915\u0930\u0947\u0902', other: 'Google Calendar \u0928\u0939\u0940\u0902 \u0939\u0948?' },
-        ja: { tagline: '\u3053\u306E\u4E88\u7D04\u3092\u30AB\u30EC\u30F3\u30C0\u30FC\u306B\u8FFD\u52A0', btn: 'Google Calendar', retry: '\u30BF\u30C3\u30D7\u3057\u3066\u8FFD\u52A0', retryTagline: '\u30DC\u30BF\u30F3\u3092\u30BF\u30C3\u30D7', other: 'Google Calendar\u4EE5\u5916\uFF1F' },
-        ko: { tagline: '\uC774 \uC608\uC57D\uC744 \uCE98\uB9B0\uB354\uC5D0 \uCD94\uAC00', btn: 'Google Calendar', retry: '\uD0ED\uD558\uC5EC \uCD94\uAC00', retryTagline: '\uBC84\uD2BC\uC744 \uD0ED\uD558\uC138\uC694', other: 'Google Calendar\uC774 \uC544\uB2CC\uAC00\uC694?' },
-        uk: { tagline: '\u0414\u043E\u0434\u0430\u0439\u0442\u0435 \u0437\u0443\u0441\u0442\u0440\u0456\u0447 \u0434\u043E \u043A\u0430\u043B\u0435\u043D\u0434\u0430\u0440\u044F', btn: 'Google Calendar', retry: '\u041D\u0430\u0442\u0438\u0441\u043D\u0456\u0442\u044C \u0434\u043B\u044F \u0434\u043E\u0434\u0430\u0432\u0430\u043D\u043D\u044F', retryTagline: '\u041D\u0430\u0442\u0438\u0441\u043D\u0456\u0442\u044C \u043A\u043D\u043E\u043F\u043A\u0443', other: '\u041D\u0435 Google Calendar?' },
-        pl: { tagline: 'Dodaj to spotkanie do kalendarza', btn: 'Google Calendar', retry: 'Dotknij, aby dodac', retryTagline: 'Dotknij przycisku', other: 'Nie uzywasz Google Calendar?' },
-        nl: { tagline: 'Voeg deze afspraak toe aan je agenda', btn: 'Google Calendar', retry: 'Tik om toe te voegen', retryTagline: 'Tik op de knop', other: 'Geen Google Calendar?' },
-        sv: { tagline: 'Lagg till detta mote i din kalender', btn: 'Google Calendar', retry: 'Tryck for att lagga till', retryTagline: 'Tryck pa knappen', other: 'Inte Google Calendar?' },
-        th: { tagline: '\u0E40\u0E1E\u0E34\u0E48\u0E21\u0E19\u0E31\u0E14\u0E19\u0E35\u0E49\u0E25\u0E07\u0E1B\u0E0F\u0E34\u0E17\u0E34\u0E19', btn: 'Google Calendar', retry: '\u0E41\u0E15\u0E30\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E40\u0E1E\u0E34\u0E48\u0E21', retryTagline: '\u0E41\u0E15\u0E30\u0E1B\u0E38\u0E48\u0E21', other: '\u0E44\u0E21\u0E48\u0E43\u0E0A\u0E49 Google Calendar?' },
-        fa: { tagline: '\u0627\u06CC\u0646 \u0642\u0631\u0627\u0631 \u0645\u0644\u0627\u0642\u0627\u062A \u0631\u0627 \u0628\u0647 \u062A\u0642\u0648\u06CC\u0645 \u0627\u0636\u0627\u0641\u0647 \u06A9\u0646\u06CC\u062F', btn: 'Google Calendar', retry: '\u0628\u0631\u0627\u06CC \u0627\u0636\u0627\u0641\u0647 \u06A9\u0631\u062F\u0646 \u0628\u0632\u0646\u06CC\u062F', retryTagline: '\u062F\u06A9\u0645\u0647 \u0631\u0627 \u0628\u0632\u0646\u06CC\u062F', other: '\u0627\u0632 Google Calendar \u0627\u0633\u062A\u0641\u0627\u062F\u0647 \u0646\u0645\u06CC\u200C\u06A9\u0646\u06CC\u062F\u061F' },
+        en: { tagline: 'Add this appointment to your calendar', btn: 'Google Calendar', retry: 'Tap here to add', retryTagline: 'Tap the button to add', other: 'Not using Google Calendar?', footer: 'Scheduling by Swipcall' },
+        he: { tagline: '\u05D4\u05D5\u05E1\u05E3 \u05EA\u05D5\u05E8 \u05DC\u05D9\u05D5\u05DE\u05DF \u05E9\u05DC\u05DA', btn: 'Google Calendar', retry: '\u05DC\u05D7\u05E5 \u05DB\u05D0\u05DF \u05DC\u05D4\u05D5\u05E1\u05E4\u05D4', retryTagline: '\u05DC\u05D7\u05E5 \u05E2\u05DC \u05D4\u05DB\u05E4\u05EA\u05D5\u05E8 \u05DC\u05D4\u05D5\u05E1\u05E4\u05D4', other: '\u05DC\u05D0 \u05DE\u05E9\u05EA\u05DE\u05E9 \u05D1-Google Calendar?', footer: '\u05EA\u05D9\u05D0\u05D5\u05DD \u05E4\u05D2\u05D9\u05E9\u05D5\u05EA \u05E2\u05DD Swipcall' },
+        ar: { tagline: '\u0623\u0636\u0641 \u0647\u0630\u0627 \u0627\u0644\u0645\u0648\u0639\u062F \u0625\u0644\u0649 \u062A\u0642\u0648\u064A\u0645\u0643', btn: 'Google Calendar', retry: '\u0627\u0636\u063A\u0637 \u0647\u0646\u0627 \u0644\u0644\u0625\u0636\u0627\u0641\u0629', retryTagline: '\u0627\u0636\u063A\u0637 \u0627\u0644\u0632\u0631 \u0644\u0644\u0625\u0636\u0627\u0641\u0629', other: '\u0644\u0627 \u062A\u0633\u062A\u062E\u062F\u0645 Google Calendar\u061F', footer: 'Scheduling by Swipcall' },
+        es: { tagline: 'Agrega esta cita a tu calendario', btn: 'Google Calendar', retry: 'Toca para agregar', retryTagline: 'Toca el boton para agregar', other: 'No usas Google Calendar?', footer: 'Agendamiento con Swipcall' },
+        fr: { tagline: 'Ajoutez ce rendez-vous a votre calendrier', btn: 'Google Calendar', retry: 'Appuyez pour ajouter', retryTagline: 'Appuyez sur le bouton', other: 'Pas Google Calendar ?', footer: 'Planification par Swipcall' },
+        de: { tagline: 'Termin zum Kalender hinzufugen', btn: 'Google Calendar', retry: 'Tippen zum Hinzufugen', retryTagline: 'Auf den Button tippen', other: 'Kein Google Calendar?', footer: 'Terminplanung mit Swipcall' },
+        ru: { tagline: '\u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u0432\u0441\u0442\u0440\u0435\u0447\u0443 \u0432 \u043A\u0430\u043B\u0435\u043D\u0434\u0430\u0440\u044C', btn: 'Google Calendar', retry: '\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u0434\u043B\u044F \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u044F', retryTagline: '\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043A\u043D\u043E\u043F\u043A\u0443', other: '\u041D\u0435 Google Calendar?', footer: 'Scheduling by Swipcall' },
+        pt: { tagline: 'Adicione este compromisso ao seu calendario', btn: 'Google Calendar', retry: 'Toque para adicionar', retryTagline: 'Toque no botao para adicionar', other: 'Nao usa Google Calendar?', footer: 'Agendamento por Swipcall' },
+        tr: { tagline: 'Bu randevuyu takvimine ekle', btn: 'Google Calendar', retry: 'Eklemek icin dokun', retryTagline: 'Eklemek icin butona dokun', other: 'Google Calendar kullanmiyor musun?', footer: 'Scheduling by Swipcall' },
+        it: { tagline: 'Aggiungi questo appuntamento al calendario', btn: 'Google Calendar', retry: 'Tocca per aggiungere', retryTagline: 'Tocca il pulsante', other: 'Non usi Google Calendar?', footer: 'Pianificazione con Swipcall' },
+        zh: { tagline: '\u5C06\u6B64\u9884\u7EA6\u6DFB\u52A0\u5230\u65E5\u5386', btn: 'Google Calendar', retry: '\u70B9\u51FB\u6DFB\u52A0', retryTagline: '\u70B9\u51FB\u6309\u94AE\u6DFB\u52A0', other: '\u4E0D\u4F7F\u7528 Google Calendar\uFF1F', footer: 'Scheduling by Swipcall' },
+        hi: { tagline: '\u0907\u0938 \u0905\u092A\u0949\u0907\u0902\u091F\u092E\u0947\u0902\u091F \u0915\u094B \u0905\u092A\u0928\u0947 \u0915\u0948\u0932\u0947\u0902\u0921\u0930 \u092E\u0947\u0902 \u091C\u094B\u0921\u093C\u0947\u0902', btn: 'Google Calendar', retry: '\u091C\u094B\u0921\u093C\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F \u091F\u0948\u092A \u0915\u0930\u0947\u0902', retryTagline: '\u092C\u091F\u0928 \u091F\u0948\u092A \u0915\u0930\u0947\u0902', other: 'Google Calendar \u0928\u0939\u0940\u0902 \u0939\u0948?', footer: 'Scheduling by Swipcall' },
+        ja: { tagline: '\u3053\u306E\u4E88\u7D04\u3092\u30AB\u30EC\u30F3\u30C0\u30FC\u306B\u8FFD\u52A0', btn: 'Google Calendar', retry: '\u30BF\u30C3\u30D7\u3057\u3066\u8FFD\u52A0', retryTagline: '\u30DC\u30BF\u30F3\u3092\u30BF\u30C3\u30D7', other: 'Google Calendar\u4EE5\u5916\uFF1F', footer: 'Scheduling by Swipcall' },
+        ko: { tagline: '\uC774 \uC608\uC57D\uC744 \uCE98\uB9B0\uB354\uC5D0 \uCD94\uAC00', btn: 'Google Calendar', retry: '\uD0ED\uD558\uC5EC \uCD94\uAC00', retryTagline: '\uBC84\uD2BC\uC744 \uD0ED\uD558\uC138\uC694', other: 'Google Calendar\uC774 \uC544\uB2CC\uAC00\uC694?', footer: 'Scheduling by Swipcall' },
+        uk: { tagline: '\u0414\u043E\u0434\u0430\u0439\u0442\u0435 \u0437\u0443\u0441\u0442\u0440\u0456\u0447 \u0434\u043E \u043A\u0430\u043B\u0435\u043D\u0434\u0430\u0440\u044F', btn: 'Google Calendar', retry: '\u041D\u0430\u0442\u0438\u0441\u043D\u0456\u0442\u044C \u0434\u043B\u044F \u0434\u043E\u0434\u0430\u0432\u0430\u043D\u043D\u044F', retryTagline: '\u041D\u0430\u0442\u0438\u0441\u043D\u0456\u0442\u044C \u043A\u043D\u043E\u043F\u043A\u0443', other: '\u041D\u0435 Google Calendar?', footer: 'Scheduling by Swipcall' },
+        pl: { tagline: 'Dodaj to spotkanie do kalendarza', btn: 'Google Calendar', retry: 'Dotknij, aby dodac', retryTagline: 'Dotknij przycisku', other: 'Nie uzywasz Google Calendar?', footer: 'Scheduling by Swipcall' },
+        nl: { tagline: 'Voeg deze afspraak toe aan je agenda', btn: 'Google Calendar', retry: 'Tik om toe te voegen', retryTagline: 'Tik op de knop', other: 'Geen Google Calendar?', footer: 'Planning met Swipcall' },
+        sv: { tagline: 'Lagg till detta mote i din kalender', btn: 'Google Calendar', retry: 'Tryck for att lagga till', retryTagline: 'Tryck pa knappen', other: 'Inte Google Calendar?', footer: 'Scheduling by Swipcall' },
+        th: { tagline: '\u0E40\u0E1E\u0E34\u0E48\u0E21\u0E19\u0E31\u0E14\u0E19\u0E35\u0E49\u0E25\u0E07\u0E1B\u0E0F\u0E34\u0E17\u0E34\u0E19', btn: 'Google Calendar', retry: '\u0E41\u0E15\u0E30\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E40\u0E1E\u0E34\u0E48\u0E21', retryTagline: '\u0E41\u0E15\u0E30\u0E1B\u0E38\u0E48\u0E21', other: '\u0E44\u0E21\u0E48\u0E43\u0E0A\u0E49 Google Calendar?', footer: 'Scheduling by Swipcall' },
+        fa: { tagline: '\u0627\u06CC\u0646 \u0642\u0631\u0627\u0631 \u0645\u0644\u0627\u0642\u0627\u062A \u0631\u0627 \u0628\u0647 \u062A\u0642\u0648\u06CC\u0645 \u0627\u0636\u0627\u0641\u0647 \u06A9\u0646\u06CC\u062F', btn: 'Google Calendar', retry: '\u0628\u0631\u0627\u06CC \u0627\u0636\u0627\u0641\u0647 \u06A9\u0631\u062F\u0646 \u0628\u0632\u0646\u06CC\u062F', retryTagline: '\u062F\u06A9\u0645\u0647 \u0631\u0627 \u0628\u0632\u0646\u06CC\u062F', other: '\u0627\u0632 Google Calendar \u0627\u0633\u062A\u0641\u0627\u062F\u0647 \u0646\u0645\u06CC\u200C\u06A9\u0646\u06CC\u062F\u061F', footer: 'Scheduling by Swipcall' },
       };
 
       var rtlLangs = { he: 1, ar: 1, fa: 1, ur: 1 };
@@ -206,6 +228,7 @@
       document.getElementById('mainBtnText').textContent = i18n.btn;
       document.getElementById('retryBtnText').textContent = i18n.retry;
       document.getElementById('otherBtnText').textContent = i18n.other;
+      document.getElementById('footerLink').textContent = i18n.footer;
 
       // --- URL params ---
       var params = new URLSearchParams(window.location.search);
