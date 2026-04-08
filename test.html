@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar Link Test</title>
+  <style>
+    body { background: #1C1C1E; color: #fff; font-family: sans-serif; padding: 20px; }
+    a { display: block; background: #FF6B35; color: #fff; padding: 16px; border-radius: 10px;
+        text-decoration: none; text-align: center; margin: 12px 0; font-size: 16px; }
+    h3 { color: #8E8E93; margin-top: 24px; font-size: 14px; }
+    .warn { color: #E74C3C; font-size: 13px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h2>Calendar Link Test</h2>
+  <p class="warn">לפני כל בדיקה: force close לאפליקציית היומן</p>
+
+  <h3>12. intent + content scheme + extras</h3>
+  <a href="intent://com.android.calendar/events#Intent;scheme=content;action=android.intent.action.INSERT;l.beginTime=1781348400000;l.endTime=1781352000000;S.title=Test+Event+12;S.eventLocation=Test+Location;end">Test 12</a>
+
+  <h3>13. intent + https scheme + URL + extras</h3>
+  <a href="intent://calendar.google.com/calendar/r/eventedit?text=Test+Event+13&dates=20260410T140000/20260410T150000&location=Test+Location#Intent;scheme=https;package=com.google.android.calendar;l.beginTime=1781348400000;l.endTime=1781352000000;S.title=Test+Event+13;S.eventLocation=Test+Location;end">Test 13</a>
+
+  <h3>14. intent + action + type + extras (no data)</h3>
+  <a href="intent://#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/event;l.beginTime=1781348400000;l.endTime=1781352000000;S.title=Test+Event+14;S.eventLocation=Test+Location;end">Test 14</a>
+
+  <h3>15. intent + content URI (no type)</h3>
+  <a href="intent://com.android.calendar/events#Intent;scheme=content;action=android.intent.action.INSERT;l.beginTime=1781348400000;l.endTime=1781352000000;S.title=Test+Event+15;S.eventLocation=Test+Location;S.description=Test+Description;end">Test 15</a>
+
+  <h3>16. intent + package google calendar + extras only</h3>
+  <a href="intent://#Intent;action=android.intent.action.INSERT;package=com.google.android.calendar;type=vnd.android.cursor.dir/event;l.beginTime=1781348400000;l.endTime=1781352000000;S.title=Test+Event+16;S.eventLocation=Test+Location;end">Test 16</a>
+
+  <h3>17. intent + EDIT action (not INSERT)</h3>
+  <a href="intent://com.android.calendar/events#Intent;scheme=content;action=android.intent.action.EDIT;type=vnd.android.cursor.dir/event;l.beginTime=1781348400000;l.endTime=1781352000000;S.title=Test+Event+17;S.eventLocation=Test+Location;end">Test 17</a>
+
+  <h3>18. .ics auto-download</h3>
+  <a href="#" id="icsBtn">Test 18 (ICS)</a>
+
+  <script>
+    document.getElementById('icsBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      var ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Swipcall//EN',
+        'BEGIN:VEVENT',
+        'DTSTART:20260410T110000Z',
+        'DTEND:20260410T120000Z',
+        'SUMMARY:Test Event 18',
+        'LOCATION:Test Location',
+        'DESCRIPTION:Test Description',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+      var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'event.ics';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
